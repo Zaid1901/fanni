@@ -40,9 +40,11 @@ class AccountScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('حسابي', style: text.titleLarge),
-                      const Text(
-                        'حساب تجريبي · عمّان',
-                        style: TextStyle(color: AppColors.muted),
+                      Text(
+                        state.isTech
+                            ? 'فني تجريبي · عمّان'
+                            : 'زبون تجريبي · عمّان',
+                        style: const TextStyle(color: AppColors.muted),
                       ),
                     ],
                   ),

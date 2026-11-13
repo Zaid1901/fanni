@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../data/mock_data.dart';
 import '../theme/app_colors.dart';
 import '../widgets/blob.dart';
 import '../widgets/common.dart';
@@ -24,6 +25,15 @@ class _LoginScreenState extends State<LoginScreen> {
     _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  /// One-tap demo accounts, so testers don't have to type anything.
+  void _enterDemo({required bool asTech}) {
+    AppState.instance.setTechMode(asTech);
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomeShell()),
+      (_) => false,
+    );
   }
 
   void _submit() {
@@ -126,6 +136,43 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
                     PillButton(label: 'تسجيل الدخول', onPressed: _submit),
+                    const SizedBox(height: 20),
+                    const Row(
+                      children: [
+                        Expanded(child: Divider()),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            'أو ادخل بحساب تجريبي',
+                            style: TextStyle(
+                              color: AppColors.muted,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Divider()),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _DemoButton(
+                            icon: Icons.person_outline_rounded,
+                            label: 'دخول كزبون',
+                            onPressed: () => _enterDemo(asTech: false),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _DemoButton(
+                            icon: Icons.handyman_outlined,
+                            label: 'دخول كفني',
+                            onPressed: () => _enterDemo(asTech: true),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -147,6 +194,41 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DemoButton extends StatelessWidget {
+  const _DemoButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        textStyle: text.labelLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+          fontSize: 14.5,
+        ),
+      ),
+      onPressed: onPressed,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 20),
+          const SizedBox(width: 6),
+          Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
+        ],
       ),
     );
   }
