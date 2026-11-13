@@ -19,13 +19,31 @@ class _SignupScreenState extends State<SignupScreen> {
   Trade? _trade;
   bool _tradeError = false;
   bool _hidden = true;
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
 
   void _submit() {
     final ok = _formKey.currentState!.validate();
     final tradeMissing = _isTech && _trade == null;
     setState(() => _tradeError = tradeMissing);
     if (!ok || tradeMissing) return;
-    AppState.instance.setTechMode(_isTech);
+    AppState.instance.register(
+      Account(
+        name: _name.text.trim(),
+        email: _email.text.trim(),
+        password: _password.text,
+        isTech: _isTech,
+      ),
+    );
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const HomeShell()),
       (_) => false,
@@ -76,6 +94,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 LabeledField(
                   label: 'الاسم الكامل',
                   child: TextFormField(
+                    controller: _name,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.person_outline_rounded),
@@ -89,6 +108,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 LabeledField(
                   label: 'البريد الإلكتروني',
                   child: TextFormField(
+                    controller: _email,
                     keyboardType: TextInputType.emailAddress,
                     textDirection: TextDirection.ltr,
                     textAlign: TextAlign.end,
@@ -97,15 +117,22 @@ class _SignupScreenState extends State<SignupScreen> {
                       hintText: 'name@example.com',
                       prefixIcon: Icon(Icons.mail_outline_rounded),
                     ),
-                    validator: (v) => (v == null || !v.contains('@'))
-                        ? 'اكتب بريد إلكتروني صحيح'
-                        : null,
+                    validator: (v) {
+                      if (v == null || !v.contains('@')) {
+                        return 'اكتب بريد إلكتروني صحيح';
+                      }
+                      if (AppState.instance.findAccount(v) != null) {
+                        return 'هاد الإيميل مسجّل. سجّل دخولك.';
+                      }
+                      return null;
+                    },
                   ),
                 ),
                 const SizedBox(height: 16),
                 LabeledField(
                   label: 'كلمة المرور',
                   child: TextFormField(
+                    controller: _password,
                     obscureText: _hidden,
                     decoration: InputDecoration(
                       hintText: '8 أحرف على الأقل',

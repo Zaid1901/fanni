@@ -159,3 +159,18 @@ class ProblemPost {
 
   bool get open => chosen == null;
 }
+
+/// A sign-in account. Kept in memory only; there is no backend yet.
+class Account {
+  const Account({
+    required this.name,
+    required this.email,
+    required this.password,
+    required this.isTech,
+  });
+
+  final String name;
+  final String email;
+  final String password;
+  final bool isTech;
+}

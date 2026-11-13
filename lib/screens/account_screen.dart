@@ -28,8 +28,8 @@ class AccountScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const BlobAvatar(
-                  name: 'ضيف',
+                BlobAvatar(
+                  name: state.user?.name ?? 'ضيف',
                   color: AppColors.yellow,
                   size: 64,
                   seed: 11,
@@ -39,11 +39,9 @@ class AccountScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('حسابي', style: text.titleLarge),
+                      Text(state.user?.name ?? 'حسابي', style: text.titleLarge),
                       Text(
-                        state.isTech
-                            ? 'فني تجريبي · عمّان'
-                            : 'زبون تجريبي · عمّان',
+                        state.isTech ? 'فني · عمّان' : 'زبون · عمّان',
                         style: const TextStyle(color: AppColors.muted),
                       ),
                     ],
@@ -164,10 +162,13 @@ class AccountScreen extends StatelessWidget {
             _Row(
               icon: Icons.logout_rounded,
               label: 'تسجيل الخروج',
-              onTap: () => Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (_) => false,
-              ),
+              onTap: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (_) => false,
+                );
+                state.signOut();
+              },
             ),
           ],
         ),

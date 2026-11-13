@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _hidden = true;
+  String? _authError;
 
   @override
   void dispose() {
@@ -29,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   /// One-tap demo accounts, so testers don't have to type anything.
   void _enterDemo({required bool asTech}) {
-    AppState.instance.setTechMode(asTech);
+    AppState.instance.signIn(asTech ? demoTech : demoCustomer);
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const HomeShell()),
       (_) => false,
@@ -38,7 +39,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    // No backend yet: any filled-in form signs in.
+    // No backend yet: accounts are checked against the in-memory list.
+    final account = AppState.instance.findAccount(_email.text);
+    if (account == null || account.password != _password.text) {
+      setState(
+        () =>
+            _authError = 'الإيميل أو كلمة المرور غلط. جرّب حساب تجريبي من تحت.',
+      );
+      return;
+    }
+    AppState.instance.signIn(account);
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const HomeShell()),
       (_) => false,
@@ -134,6 +144,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         onFieldSubmitted: (_) => _submit(),
                       ),
                     ),
+                    if (_authError != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        _authError!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppColors.danger,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                     PillButton(label: 'تسجيل الدخول', onPressed: _submit),
                     const SizedBox(height: 20),

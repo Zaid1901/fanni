@@ -155,10 +155,24 @@ final posts = <Post>[
 
 const cities = ['عمّان', 'الزرقاء', 'إربد'];
 
+/// Two ready-made demo accounts for testers. Fake people, fake credentials.
+const demoCustomer = Account(
+  name: 'ليث حداد',
+  email: 'zaboon@fanni.demo',
+  password: 'fanni2026',
+  isTech: false,
+);
+const demoTech = Account(
+  name: 'يوسف عيسى',
+  email: 'fanni@fanni.demo',
+  password: 'fanni2026',
+  isTech: true,
+);
+
 /// The signed-in user's own technician profile, used in technician mode.
 const myTech = Technician(
   id: 99,
-  name: 'حسابك التجريبي',
+  name: 'يوسف عيسى',
   trade: Trade.electric,
   city: 'عمّان',
   district: 'طبربور',
@@ -239,6 +253,38 @@ class AppState extends ChangeNotifier {
   final List<Work> myWorks = [
     const Work('تركيب إنارة مخفية لصالون', 60, 90, 31),
   ];
+
+  /// Accounts that can sign in: the two demo ones, plus any created
+  /// through the sign-up screen during this run.
+  final List<Account> accounts = [demoCustomer, demoTech];
+
+  /// The signed-in account, or null before sign-in.
+  Account? user;
+
+  Account? findAccount(String email) {
+    final key = email.trim().toLowerCase();
+    for (final a in accounts) {
+      if (a.email.toLowerCase() == key) return a;
+    }
+    return null;
+  }
+
+  void signIn(Account account) {
+    user = account;
+    isTech = account.isTech;
+    notifyListeners();
+  }
+
+  void register(Account account) {
+    accounts.add(account);
+    signIn(account);
+  }
+
+  void signOut() {
+    user = null;
+    isTech = false;
+    notifyListeners();
+  }
 
   void setTechMode(bool value) {
     isTech = value;
